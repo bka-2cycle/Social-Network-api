@@ -1,4 +1,4 @@
-const { Thought, User } = require('../models');
+const { Thought, User } = require("../models");
 
 module.exports = {
   // Function to get all of the thoughts by invoking the find() method with no arguments.
@@ -13,8 +13,8 @@ module.exports = {
     Thought.findOne({ _id: req.params.thoughtId })
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: 'No thought with that ID' })
-          : res.json(application)
+          ? res.status(404).json({ message: "No thought with that ID" })
+          : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
   },
@@ -24,7 +24,7 @@ module.exports = {
     Thought.create(req.body)
       .then((thought) => {
         return User.findOneAndUpdate(
-          { _id: req.body.userId },
+          { _id: req.body.userName },
           { $addToSet: { thoughts: thought._id } },
           { new: true }
         );
@@ -32,9 +32,9 @@ module.exports = {
       .then((user) =>
         !user
           ? res.status(404).json({
-              message: 'Thought created, but found no user with that ID',
+              message: "Thought created, but found no user with that ID",
             })
-          : res.json('Created the thought 🎉')
+          : res.json("Created the thought 🎉")
       )
       .catch((err) => {
         console.log(err);
@@ -50,7 +50,7 @@ module.exports = {
     )
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: 'No thought with this id!' })
+          ? res.status(404).json({ message: "No thought with this id!" })
           : res.json(thought)
       )
       .catch((err) => {
@@ -58,13 +58,13 @@ module.exports = {
         res.status(500).json(err);
       });
   },
-  // Deletes an application from the database. Looks for an app by ID.
-  // Then if the app exists, we look for any users associated with the app based on he app ID and update the applications array for the User.
+  // Deletes a thought from the database. Looks for a thought by ID.
+  // Then if the thought exists, we look for any users associated with the thought based on he thought ID and update the thoughts array for the User.
   deleteThought(req, res) {
     Thought.findOneAndRemove({ _id: req.params.thoughtId })
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: 'No thought with this id!' })
+          ? res.status(404).json({ message: "No thought with this id!" })
           : User.findOneAndUpdate(
               { thoughts: req.params.thoughtId },
               { $pull: { thoughts: req.params.thoughtId } },
@@ -74,9 +74,9 @@ module.exports = {
       .then((user) =>
         !user
           ? res.status(404).json({
-              message: 'Thought created but no user with this id!',
+              message: "Thought deleted but no user with this id!",
             })
-          : res.json({ message: 'Thought successfully deleted!' })
+          : res.json({ message: "Thought successfully deleted!" })
       )
       .catch((err) => res.status(500).json(err));
   },
@@ -84,12 +84,12 @@ module.exports = {
   addReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $addToSet: { reaction: req.body } },
+      { $addToSet: { reactions: req.body } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: 'No thought with this id!' })
+          ? res.status(404).json({ message: "No thought with this id!" })
           : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
@@ -98,12 +98,12 @@ module.exports = {
   removeReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reaction: { reactionId: req.params.reactionId } } },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
         !thought
-          ? res.status(404).json({ message: 'No thought with this id!' })
+          ? res.status(404).json({ message: "No thought with this id!" })
           : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
